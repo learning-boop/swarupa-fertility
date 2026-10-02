@@ -2,11 +2,13 @@ import { ArrowLeft, ArrowUpRight, CalendarHeart } from 'lucide-react';
 import { posts } from '../data/blog';
 import Todo from './Todo';
 import { SplitText } from './Shapes';
-import mother from '../assets/mother.webp';
 import family from '../assets/hero-family.webp';
-import drPhoto from '../assets/dr-chandana.webp';
 
-const covers = [mother, family, drPhoto];
+// Each post's `cover` names a file in src/assets/blog/; posts without one fall back to the family photo.
+const covers = Object.fromEntries(
+  Object.entries(import.meta.glob('../assets/blog/*.{webp,jpg,jpeg,png}', { eager: true, import: 'default' }))
+    .map(([path, url]) => [path.split('/').pop().replace(/\.\w+$/, ''), url]),
+);
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -31,7 +33,7 @@ export default function Blog() {
             <li key={p.slug} className="reveal" style={{ transitionDelay: `${i * 100}ms` }}>
               <a href={`#/blog/${p.slug}`} className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-white p-3 shadow-card transition duration-500 hover:-translate-y-1.5 hover:shadow-soft">
                 <div className="relative h-56 overflow-hidden rounded-[1.4rem]">
-                  <img src={covers[i % covers.length]} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <img src={covers[p.cover] ?? family} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <span className="absolute inset-0 bg-gradient-to-t from-navy-night/40 to-transparent" />
                   <span className="absolute left-4 top-4 grid h-12 w-12 place-items-center rounded-xl bg-navy font-display text-[1.2rem] text-white">
                     {String(i + 1).padStart(2, '0')}

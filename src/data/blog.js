@@ -3,6 +3,7 @@
 export const posts = [
   {
     slug: 'understanding-ivf-treatment',
+    cover: 'ivf', // src/assets/blog/ivf.webp
     title: 'Understanding IVF treatment',
     date: null, // e.g. '2026-10-01'
     reviewedBy: null, // e.g. 'Dr. Chandana Veeramachaneni, MS (OBG)'
@@ -24,6 +25,7 @@ export const posts = [
   },
   {
     slug: 'iui-vs-ivf',
+    cover: 'iui-vs-ivf', // src/assets/blog/iui-vs-ivf.webp
     title: 'IUI vs IVF: understanding the difference',
     date: null,
     reviewedBy: null,
@@ -42,6 +44,7 @@ export const posts = [
   },
   {
     slug: 'when-to-see-a-fertility-specialist',
+    cover: 'specialist', // src/assets/blog/specialist.webp
     title: 'When should you consult a fertility specialist?',
     date: null,
     reviewedBy: null,

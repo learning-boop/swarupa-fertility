@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Quote, Star } from 'lucide-react';
 import { site, testimonials } from '../config/site';
 import { SplitText } from './Shapes';
-import family from '../assets/hero-family.webp';
+import family from '../assets/stories-family.webp';
 
 export default function Testimonials() {
   const items = testimonials.filter((t) => site.showPlaceholders || !t.sample);
@@ -45,7 +45,7 @@ export default function Testimonials() {
 
         <div className="relative hidden lg:block">
           <div className="img-reveal overflow-hidden rounded-[2rem] shadow-soft">
-            <img src={family} alt="" decoding="async" className="aspect-[4/5] w-full object-cover object-[65%_center]" />
+            <img src={family} alt="" decoding="async" className="aspect-[4/5] w-full object-cover object-[50%_30%]" />
           </div>
           <p aria-hidden="true" className="absolute -right-10 top-1/2 -translate-y-1/2 rotate-90 whitespace-nowrap font-display text-[1rem] tracking-[0.2em] text-navy/50">
             {String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}

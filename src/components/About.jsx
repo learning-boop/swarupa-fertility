@@ -1,8 +1,8 @@
 import { ArrowUpRight, CircleCheck, HeartHandshake, Microscope, ShieldCheck, Stethoscope, Baby } from 'lucide-react';
 import { site, taglines } from '../config/site';
 import { SplitText } from './Shapes';
-import family from '../assets/hero-family.webp';
-import mother from '../assets/mother.webp';
+import family from '../assets/about-family.webp';
+import mother from '../assets/about-mother.webp';
 
 const points = [
   'Consultations led by a gynaecologist, infertility specialist and laparoscopic surgeon',
@@ -25,11 +25,11 @@ export default function About() {
         {/* overlapping image collage with parallax, like the reference */}
         <div className="relative mx-auto h-[460px] w-full max-w-[560px] sm:h-[560px]">
           <div className="img-reveal absolute left-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-3xl shadow-soft">
-            <img src={family} alt="Parents holding their newborn" decoding="async" className="h-full w-full object-cover object-[60%_30%]" />
+            <img src={family} alt="Parents tenderly holding their newborn" decoding="async" className="h-full w-full object-cover object-[50%_20%]" />
           </div>
           <div data-speed="0.08" className="absolute bottom-0 right-0 w-[52%]">
             <div className="img-reveal overflow-hidden rounded-3xl border-[6px] border-mist shadow-soft" style={{ transitionDelay: '.25s' }}>
-              <img src={mother} alt="An expectant mother at sunrise" decoding="async" className="aspect-[4/5] w-full object-cover" />
+              <img src={mother} alt="An expectant mother's henna-decorated hand resting on her baby bump" decoding="async" className="aspect-[4/5] w-full object-cover" />
             </div>
           </div>
           <div data-speed="-0.05" className="absolute bottom-8 left-[6%] max-w-[230px] rounded-2xl bg-white p-4 shadow-card">

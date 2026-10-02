@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { taglines } from '../config/site';
 import { SplitText } from './Shapes';
-import mother from '../assets/mother.webp';
+import family from '../assets/why-family.webp';
 
 const reasons = [
   ['Expert care', 'Consultations with a consultant gynaecologist, infertility specialist and laparoscopic surgeon who explains each finding in plain language.'],
@@ -52,10 +52,11 @@ export default function WhyChoose() {
 
         <div className="relative">
           <div className="img-reveal relative overflow-hidden rounded-[2rem] shadow-soft">
-            <img src={mother} alt="Expectant mother" decoding="async" className="aspect-[4/5] w-full object-cover sm:aspect-[5/5] lg:aspect-[4/5]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy-night/85 via-navy-night/10 to-transparent" />
+            <img src={family} alt="Smiling parents holding their baby outdoors" decoding="async" className="aspect-[4/5] w-full object-cover object-[50%_30%] sm:aspect-[5/5] lg:aspect-[4/5]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-night/60 via-navy-night/5 to-transparent" />
           </div>
-          <div className="absolute inset-x-4 bottom-4 rounded-3xl bg-navy-night/80 p-6 text-white ring-1 ring-white/10 backdrop-blur-md sm:inset-x-6 sm:bottom-6 sm:p-8">
+          {/* light tint + minimal blur so the baby behind the card stays visible; text-shadow keeps the copy legible */}
+          <div className="absolute inset-x-4 bottom-4 rounded-3xl bg-navy-night/40 p-6 text-white ring-1 ring-white/20 backdrop-blur-[2px] [text-shadow:0_1px_3px_rgb(5_42_78/0.8)] sm:inset-x-6 sm:bottom-6 sm:p-8">
             <p className="font-display text-[1.45rem] leading-snug">{taglines.care}</p>
             <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5 text-[0.93rem]">
               {includes.map((x) => (

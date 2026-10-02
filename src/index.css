@@ -110,8 +110,7 @@
 .pill-fill { transform: scaleY(0); transform-origin: bottom; transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }
 .is-in .pill-fill { transform: scaleY(1); }
 
-/* card image notch (the "Read more" tab cut into the photo) */
-.notch { position: relative; }
+/* card image notch (the "Read more" tab cut into the photo); the element itself must be positioned (e.g. `absolute`) */
 .notch::before, .notch::after { content: ""; position: absolute; top: 0; width: 22px; height: 22px; }
 .notch::before { left: -22px; background: radial-gradient(circle at 0 100%, transparent 21px, var(--notch-bg, #fff) 22px); }
 .notch::after { right: -22px; background: radial-gradient(circle at 100% 100%, transparent 21px, var(--notch-bg, #fff) 22px); }

@@ -8,6 +8,12 @@ import { otherDepartments, site } from '../config/site';
 import { SplitText } from './Shapes';
 
 const Icons = { ClipboardList, Droplets, FlaskConical, Microscope, Syringe, HeartHandshake, Snowflake, ScanSearch, Eye, HeartPulse, Flower2 };
+// Drop a photo at src/assets/treatments/<treatment id>.webp (e.g. ivf.webp) and its card uses it;
+// treatments without a photo keep the gradient art.
+const photos = Object.fromEntries(
+  Object.entries(import.meta.glob('../assets/treatments/*.{webp,jpg,jpeg,png}', { eager: true, import: 'default' }))
+    .map(([path, url]) => [path.split('/').pop().replace(/\.\w+$/, ''), url]),
+);
 const arts = [
   'from-navy to-ocean',
   'from-magenta to-plum',
@@ -59,19 +65,23 @@ function TreatmentDialog({ item, onClose }) {
   );
 }
 
-/** Auto-playing card slider with dots, arrows and swipe (scroll-snap). Pauses on hover and focus. */
+/** Auto-playing card slider that advances one card at a time, with dash pagination, arrows and swipe (scroll-snap).
+ *  Cards only partly in view fade back. Pauses on hover and focus. */
 export default function Treatments() {
   const [active, setActive] = useState(null);
-  const [page, setPage] = useState(0);
-  const [pages, setPages] = useState(1);
+  const [pos, setPos] = useState(0);
+  const [stops, setStops] = useState(1);
+  const [inView, setInView] = useState(() => new Set());
   const track = useRef(null);
   const paused = useRef(false);
 
   const measure = useCallback(() => {
     const el = track.current;
-    if (!el) return;
-    setPages(Math.max(1, Math.ceil((el.scrollWidth - 4) / el.clientWidth)));
-    setPage(Math.round(el.scrollLeft / el.clientWidth));
+    if (!el || !el.children.length) return;
+    const step = el.children[0].offsetWidth;
+    const perView = Math.max(1, Math.round(el.clientWidth / step));
+    setStops(Math.max(1, el.children.length - perView + 1));
+    setPos(Math.round(el.scrollLeft / step));
   }, []);
 
   useEffect(() => {
@@ -79,21 +89,28 @@ export default function Treatments() {
     measure();
     el.addEventListener('scroll', measure, { passive: true });
     window.addEventListener('resize', measure);
-    return () => { el.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); };
+    const io = new IntersectionObserver((entries) => {
+      setInView((prev) => {
+        const next = new Set(prev);
+        entries.forEach((e) => (e.intersectionRatio > 0.9 ? next.add(e.target.dataset.id) : next.delete(e.target.dataset.id)));
+        return next;
+      });
+    }, { root: el, threshold: [0, 0.9, 1] });
+    [...el.children].forEach((c) => io.observe(c));
+    return () => { el.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); io.disconnect(); };
   }, [measure]);
 
   const goTo = (p) => {
     const el = track.current;
-    const n = Math.max(1, Math.ceil((el.scrollWidth - 4) / el.clientWidth));
-    const target = ((p % n) + n) % n;
-    el.scrollTo({ left: target * el.clientWidth, behavior: 'smooth' });
+    const target = ((p % stops) + stops) % stops;
+    el.scrollTo({ left: el.children[target].offsetLeft - el.children[0].offsetLeft, behavior: 'smooth' });
   };
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => { if (!paused.current && !active) goTo(page + 1); }, 4500);
+    const id = setInterval(() => { if (!paused.current && !active) goTo(pos + 1); }, 3800);
     return () => clearInterval(id);
-  }, [page, active]);
+  }, [pos, stops, active]);
 
   return (
     <section id="treatments" className="relative bg-white py-24 lg:py-32">
@@ -111,28 +128,38 @@ export default function Treatments() {
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
         >
-          <ul ref={track} className="no-scrollbar -mx-2 flex snap-x snap-mandatory overflow-x-auto px-0" aria-label="Treatments">
+          <ul ref={track} className="no-scrollbar -mx-3 flex snap-x snap-mandatory overflow-x-auto py-2" aria-label="Treatments">
             {treatments.map((t, i) => {
               const Icon = Icons[t.icon];
+              const photo = photos[t.id];
+              const shown = inView.has(t.id);
               return (
-                <li key={t.id} className="w-full shrink-0 snap-start px-2 sm:w-1/2 lg:w-1/3 xl:w-1/4">
-                  <article className="group flex h-full flex-col rounded-[1.75rem] bg-[var(--notch-bg)] p-3 transition-colors duration-500 [--notch-bg:var(--color-mist)] hover:[--notch-bg:var(--color-blush-soft)]">
-                    <div className="flex flex-1 flex-col items-center px-4 pb-6 pt-7 text-center">
-                      <Icon size={44} strokeWidth={1.3} className="text-magenta transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110" aria-hidden="true" />
-                      <h3 className="mt-5 text-[1.4rem] leading-tight">{t.name}</h3>
+                <li key={t.id} data-id={t.id} className="w-full shrink-0 snap-start px-3 sm:w-1/2 lg:w-1/3">
+                  <article
+                    className={`group flex h-full flex-col rounded-[1.75rem] bg-[var(--notch-bg)] p-3 transition-[opacity,scale,background-color] duration-700 ease-out [--notch-bg:var(--color-mist)] hover:[--notch-bg:var(--color-blush-soft)] ${shown ? 'opacity-100' : 'scale-[0.96] opacity-40'}`}
+                  >
+                    <div className="flex flex-1 flex-col items-center px-4 pb-6 pt-8 text-center">
+                      <Icon size={48} strokeWidth={1.2} className="text-ocean transition-all duration-500 group-hover:-translate-y-1.5 group-hover:text-magenta" aria-hidden="true" />
+                      <h3 className="mt-5 text-[1.45rem] leading-tight transition-colors duration-300 group-hover:!text-magenta">{t.name}</h3>
                       <p className="mt-1 text-[0.82rem] font-semibold text-ocean">{t.full}</p>
                       <p className="mt-3 text-[0.94rem]">{t.short}</p>
                     </div>
-                    <div className={`relative h-40 overflow-hidden rounded-[1.4rem] bg-gradient-to-br ${arts[i % arts.length]}`}>
-                      <Icon size={170} strokeWidth={0.6} className="absolute -bottom-8 -right-6 text-white/15 transition-transform duration-700 group-hover:rotate-6 group-hover:scale-110" aria-hidden="true" />
-                      <span aria-hidden="true" className="absolute -left-6 top-10 h-24 w-24 rounded-full bg-white/10 transition-transform duration-700 group-hover:scale-150" />
+                    <div className={`relative h-52 overflow-hidden rounded-[1.4rem] ${photo ? '' : `bg-gradient-to-br ${arts[i % arts.length]}`}`}>
+                      {photo ? (
+                        <img src={photo} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110" />
+                      ) : (
+                        <div className="absolute inset-0 transition-transform duration-[1200ms] ease-out group-hover:scale-110">
+                          <Icon size={190} strokeWidth={0.6} className="absolute -bottom-8 -right-6 text-white/15 transition-transform duration-700 group-hover:rotate-6" aria-hidden="true" />
+                          <span aria-hidden="true" className="absolute -left-6 top-14 h-24 w-24 rounded-full bg-white/10 transition-transform duration-700 group-hover:scale-150" />
+                        </div>
+                      )}
                       <button
                         type="button"
                         onClick={() => setActive(t)}
-                        className="notch absolute left-1/2 top-0 -translate-x-1/2 rounded-b-2xl bg-[var(--notch-bg)] px-5 pb-2.5 pt-1.5 text-[0.9rem] font-semibold text-navy transition-colors group-hover:text-magenta"
+                        className="notch absolute left-1/2 top-0 z-10 -translate-x-1/2 rounded-b-2xl bg-[var(--notch-bg)] px-6 pb-3 pt-2 text-[0.92rem] font-semibold text-navy transition-colors duration-700 hover:text-magenta"
                         aria-label={`Read more about ${t.name}`}
                       >
-                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">Read More <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" /></span>
+                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">Read More <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-1" /></span>
                       </button>
                     </div>
                   </article>
@@ -142,23 +169,23 @@ export default function Treatments() {
           </ul>
 
           <div className="mt-8 flex items-center justify-center gap-5">
-            <button type="button" onClick={() => goTo(page - 1)} className="grid h-11 w-11 place-items-center rounded-full border border-navy/15 text-navy transition hover:border-magenta hover:bg-magenta hover:text-white" aria-label="Previous treatments">
+            <button type="button" onClick={() => goTo(pos - 1)} className="grid h-11 w-11 place-items-center rounded-full border border-navy/15 text-navy transition hover:border-magenta hover:bg-magenta hover:text-white" aria-label="Previous treatment">
               <ArrowLeft size={18} />
             </button>
-            <div className="flex gap-2" role="tablist" aria-label="Treatment pages">
-              {Array.from({ length: pages }).map((_, i) => (
+            <div className="flex gap-2" role="tablist" aria-label="Treatment slides">
+              {Array.from({ length: stops }).map((_, i) => (
                 <button
                   key={i}
                   type="button"
                   role="tab"
-                  aria-selected={i === page}
-                  aria-label={`Page ${i + 1}`}
+                  aria-selected={i === pos}
+                  aria-label={`Slide ${i + 1}`}
                   onClick={() => goTo(i)}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${i === page ? 'w-10 bg-magenta' : 'w-5 bg-navy/15 hover:bg-navy/30'}`}
+                  className={`h-1 rounded-full transition-all duration-500 ${i === pos ? 'w-10 bg-magenta' : 'w-6 bg-navy/15 hover:bg-navy/30'}`}
                 />
               ))}
             </div>
-            <button type="button" onClick={() => goTo(page + 1)} className="grid h-11 w-11 place-items-center rounded-full border border-navy/15 text-navy transition hover:border-magenta hover:bg-magenta hover:text-white" aria-label="Next treatments">
+            <button type="button" onClick={() => goTo(pos + 1)} className="grid h-11 w-11 place-items-center rounded-full border border-navy/15 text-navy transition hover:border-magenta hover:bg-magenta hover:text-white" aria-label="Next treatment">
               <ArrowRight size={18} />
             </button>
           </div>
