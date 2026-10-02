@@ -31,8 +31,9 @@ export default function App() {
       document.title = `${site.name}, Vijayawada`;
     } else {
       document.title = `${site.name}, Vijayawada | IVF, IUI & ICSI`;
-      if (route.anchor && route.anchor.length > 1) {
-        requestAnimationFrame(() => document.querySelector(route.anchor)?.scrollIntoView());
+      // Only plain section ids (#about); old or unknown routes such as #/blog/... just show the top of the page.
+      if (route.anchor && /^#[\w-]+$/.test(route.anchor)) {
+        requestAnimationFrame(() => document.getElementById(route.anchor.slice(1))?.scrollIntoView());
       }
     }
   }, [route]);
