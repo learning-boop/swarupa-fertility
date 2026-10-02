@@ -69,14 +69,19 @@ export default function Hero() {
               }}
               onPlaying={() => setOnVideo(true)}
               onEnded={showPhoto}
-              className={`absolute inset-0 h-full w-full object-cover object-[70%_50%] transition-opacity duration-[1500ms] ${onVideo ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute inset-0 h-full w-full object-cover object-[80%_50%] transition-opacity duration-[1500ms] ${onVideo ? 'opacity-100' : 'opacity-0'}`}
             />
           )}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-night via-navy-night/80 to-navy-night/10 lg:via-[45%] lg:via-navy-night/90 lg:to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-night/90 via-transparent to-navy-night/50" />
-        <div className="absolute -bottom-40 right-[-10%] h-[420px] w-[620px] rounded-full bg-magenta/30 blur-3xl" />
-        <div className="absolute -left-40 top-20 h-[380px] w-[380px] rounded-full bg-ocean/30 blur-3xl" />
+        {/* Shading crossfades with the slides: the photo gets the full navy wash and glows; the video keeps only
+            enough on the left for the headline, so the clip itself stays clear and true to colour. */}
+        <div className={`absolute inset-0 bg-gradient-to-r from-navy-night via-navy-night/80 to-navy-night/10 transition-opacity duration-[1500ms] lg:via-[45%] lg:via-navy-night/90 lg:to-transparent ${onVideo ? 'opacity-0' : 'opacity-100'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-r from-navy-night/90 via-navy-night/60 to-navy-night/15 transition-opacity duration-[1500ms] lg:from-navy-night lg:via-[34%] lg:via-navy-night/80 lg:to-[60%] lg:to-transparent ${onVideo ? 'opacity-100' : 'opacity-0'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-t from-navy-night/90 via-transparent to-navy-night/50 transition-opacity duration-[1500ms] ${onVideo ? 'opacity-40' : 'opacity-100'}`} />
+        <div className={`transition-opacity duration-[1500ms] ${onVideo ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="absolute -bottom-40 right-[-10%] h-[420px] w-[620px] rounded-full bg-magenta/30 blur-3xl" />
+          <div className="absolute -left-40 top-20 h-[380px] w-[380px] rounded-full bg-ocean/30 blur-3xl" />
+        </div>
       </div>
 
       {videoAllowed && (
