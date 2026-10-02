@@ -1,0 +1,12 @@
+// General pregnancy information by month. Have the doctor review before launch.
+export const months = [
+  { m: 1, weeks: 'Weeks 1–4', tri: 'First trimester', title: 'Implantation', baby: 'The fertilised egg implants in the lining of the womb and the placenta begins to form.', care: 'Start or continue folic acid, and book a first visit once the test is positive.' },
+  { m: 2, weeks: 'Weeks 5–8', tri: 'First trimester', title: 'A heartbeat appears', baby: 'The heart starts beating and can often be seen on an early scan. Tiny limb buds appear.', care: 'An early scan confirms the pregnancy and its location. Nausea and tiredness are common.' },
+  { m: 3, weeks: 'Weeks 9–13', tri: 'First trimester', title: 'Organs take shape', baby: 'All the major organs are forming, and fingers and toes are developing.', care: 'The NT scan and first-trimester screening are usually done between 11 and 14 weeks.' },
+  { m: 4, weeks: 'Weeks 14–17', tri: 'Second trimester', title: 'Growing steadily', baby: 'The baby moves, stretches and grows quickly. Facial features become more defined.', care: 'Energy often returns. Routine blood tests and blood pressure checks continue.' },
+  { m: 5, weeks: 'Weeks 18–22', tri: 'Second trimester', title: 'First movements', baby: 'Many mothers start to feel the first flutters of movement.', care: 'The detailed anomaly scan is usually done between 18 and 22 weeks.' },
+  { m: 6, weeks: 'Weeks 23–27', tri: 'Second trimester', title: 'Hearing develops', baby: 'The baby begins to respond to sounds and gains weight steadily.', care: 'A glucose test to check for gestational diabetes is usually done between 24 and 28 weeks.' },
+  { m: 7, weeks: 'Weeks 28–31', tri: 'Third trimester', title: 'The third trimester', baby: 'The eyes can open, and the brain and lungs continue to mature.', care: 'Visits become more frequent. Get to know your baby\u2019s usual pattern of movements.' },
+  { m: 8, weeks: 'Weeks 32–35', tri: 'Third trimester', title: 'Gaining weight', baby: 'The baby puts on weight and most settle into a head-down position.', care: 'A growth scan may be advised. Plan your delivery and hospital bag.' },
+  { m: 9, weeks: 'Weeks 36–40', tri: 'Third trimester', title: 'Ready to meet you', baby: 'From 37 weeks the baby is considered full term.', care: 'Know the signs of labour, and call the hospital straight away if movements reduce or there is bleeding or fluid loss.' },
+];
