@@ -33,23 +33,27 @@ export default function Faq() {
             {faqs.map(([q, a], i) => {
               const isOpen = open === i;
               return (
-                <li key={q} className={`reveal rounded-2xl transition-colors ${isOpen ? 'acc-open bg-white text-navy' : 'bg-white/[0.06] ring-1 ring-white/10'}`}>
-                  <h3 className="!font-sans">
-                    <button
-                      type="button"
-                      onClick={() => setOpen(isOpen ? -1 : i)}
-                      aria-expanded={isOpen}
-                      aria-controls={`faq-${i}`}
-                      className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[1.02rem] font-semibold ${isOpen ? 'text-navy' : 'text-white'}`}
-                    >
-                      {q}
-                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 bg-magenta text-white' : 'bg-white/10'}`}>
-                        <Plus size={17} aria-hidden="true" />
-                      </span>
-                    </button>
-                  </h3>
-                  <div id={`faq-${i}`} className="acc-panel" role="region">
-                    <div><p className="px-6 pb-6 text-body">{a}</p></div>
+                // `reveal` stays on the <li> with a static className: useReveal adds `is-in` to it directly, and a
+                // re-rendered className on the same element would wipe that class and hide the item again.
+                <li key={q} className="reveal">
+                  <div className={`rounded-2xl transition-colors ${isOpen ? 'acc-open bg-white text-navy' : 'bg-white/[0.06] ring-1 ring-white/10'}`}>
+                    <h3 className="!font-sans">
+                      <button
+                        type="button"
+                        onClick={() => setOpen(isOpen ? -1 : i)}
+                        aria-expanded={isOpen}
+                        aria-controls={`faq-${i}`}
+                        className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[1.02rem] font-semibold ${isOpen ? 'text-navy' : 'text-white'}`}
+                      >
+                        {q}
+                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 bg-magenta text-white' : 'bg-white/10'}`}>
+                          <Plus size={17} aria-hidden="true" />
+                        </span>
+                      </button>
+                    </h3>
+                    <div id={`faq-${i}`} className="acc-panel" role="region">
+                      <div><p className="px-6 pb-6 text-body">{a}</p></div>
+                    </div>
                   </div>
                 </li>
               );
