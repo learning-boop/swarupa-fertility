@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Phone, ShieldCheck, Siren } from 'lucide-react';
 import { site, doctor, taglines } from '../config/site';
 import family from '../assets/hero-family.webp';
 import drPhoto from '../assets/dr-chandana.webp';
 
-// Drop a short, silent clip at src/assets/video/hero.mp4 (or .webm) and it plays over the photo once it can.
+// Drop a short, silent clip at src/assets/video/hero.mp4 (or .webm) and the hero alternates photo → video → photo.
 const heroVideo = Object.values(import.meta.glob('../assets/video/hero.{mp4,webm}', { eager: true, import: 'default' }))[0];
 
 /** Skip the video for visitors who asked for less motion or less data; they keep the photo. */
@@ -18,33 +18,58 @@ function useVideoAllowed() {
   return allowed;
 }
 
+const PHOTO_MS = 6000; // how long the photo slide stays before the video plays through once
+
 export default function Hero() {
   const videoAllowed = useVideoAllowed();
-  const [playing, setPlaying] = useState(false);
+  const [onVideo, setOnVideo] = useState(false);
+  const videoRef = useRef(null);
+
+  const playVideo = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = 0;
+    // If the browser refuses to play, the photo simply stays; onPlaying switches the slide only once frames are moving.
+    v.play().catch(() => {});
+  };
+  const showPhoto = () => {
+    videoRef.current?.pause();
+    setOnVideo(false);
+  };
+
+  // Photo slide: every PHOTO_MS try to start the video (retrying if the browser declined); `ended` brings the photo back.
+  useEffect(() => {
+    if (!videoAllowed || onVideo) return;
+    const t = setInterval(playVideo, PHOTO_MS);
+    return () => clearInterval(t);
+  }, [videoAllowed, onVideo]);
+
   return (
     <section id="top" className="relative isolate flex min-h-[640px] items-end overflow-hidden bg-navy-night pt-32 sm:min-h-[760px] lg:min-h-[100svh]">
-      {/* full-bleed photo with slow zoom; the video fades in over it once it is actually playing */}
+      {/* two-slide carousel: full-bleed photo with slow zoom, then the video crossfades in and plays once */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-y-0 right-0 w-full overflow-hidden lg:w-[62%] lg:[mask-image:linear-gradient(to_right,transparent,black_30%)]">
           <img
             src={family}
             alt="A smiling couple cradling their newborn baby"
             fetchpriority="high"
-            className={`kenburns h-full w-full object-cover object-[62%_30%] transition-opacity duration-[1500ms] ${playing ? 'opacity-0' : 'opacity-100'}`}
+            className={`kenburns h-full w-full object-cover object-[62%_30%] transition-opacity duration-[1500ms] ${onVideo ? 'opacity-0' : 'opacity-100'}`}
           />
           {videoAllowed && (
             <video
               src={heroVideo}
-              autoPlay
               muted
-              loop
               playsInline
               preload="auto"
               aria-hidden="true"
               // iOS only autoplays when muted is set on the element itself, which React's `muted` prop doesn't guarantee.
-              ref={(v) => { if (v) { v.muted = true; v.defaultMuted = true; } }}
-              onPlaying={() => setPlaying(true)}
-              className={`absolute inset-0 h-full w-full object-cover object-[70%_50%] transition-opacity duration-[1500ms] ${playing ? 'opacity-100' : 'opacity-0'}`}
+              ref={(v) => {
+                videoRef.current = v;
+                if (v) { v.muted = true; v.defaultMuted = true; }
+              }}
+              onPlaying={() => setOnVideo(true)}
+              onEnded={showPhoto}
+              className={`absolute inset-0 h-full w-full object-cover object-[70%_50%] transition-opacity duration-[1500ms] ${onVideo ? 'opacity-100' : 'opacity-0'}`}
             />
           )}
         </div>
@@ -53,6 +78,21 @@ export default function Hero() {
         <div className="absolute -bottom-40 right-[-10%] h-[420px] w-[620px] rounded-full bg-magenta/30 blur-3xl" />
         <div className="absolute -left-40 top-20 h-[380px] w-[380px] rounded-full bg-ocean/30 blur-3xl" />
       </div>
+
+      {videoAllowed && (
+        <div className="absolute bottom-10 right-8 z-10 hidden gap-2 lg:flex" role="group" aria-label="Hero slides">
+          {[['Photo', false], ['Video', true]].map(([label, isVideo]) => (
+            <button
+              key={label}
+              type="button"
+              aria-label={`Show ${label.toLowerCase()}`}
+              aria-pressed={onVideo === isVideo}
+              onClick={() => (isVideo ? playVideo() : showPhoto())}
+              className={`h-1.5 rounded-full transition-all duration-500 ${onVideo === isVideo ? 'w-10 bg-white' : 'w-5 bg-white/40 hover:bg-white/70'}`}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="wrap relative pb-14 lg:pb-20">
         <div className="max-w-[720px]">
