@@ -176,7 +176,6 @@ export const nav = [
   { label: 'Treatments', href: '#treatments' },
   { label: 'Our Doctors', href: '#doctor' },
   { label: 'Patient Stories', href: '#stories' },
-  { label: 'Blog', href: '#blog' },
   { label: 'Contact', href: '#contact' },
 ];
 

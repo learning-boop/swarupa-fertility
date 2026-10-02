@@ -12,26 +12,23 @@ import PregnancyTimeline from './components/PregnancyTimeline';
 import VideoSection from './components/VideoSection';
 import Testimonials from './components/Testimonials';
 import Appointment from './components/Appointment';
-import Blog, { BlogPost } from './components/Blog';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Legal from './components/Legal';
 import QuickActions from './components/QuickActions';
 import { useHashRoute } from './hooks/useHashRoute';
 import { useReveal, useParallax } from './hooks/useReveal';
-import { posts } from './data/blog';
 import { site } from './config/site';
 
 export default function App() {
   const route = useHashRoute();
-  useReveal([route.page, route.slug]);
-  useParallax([route.page, route.slug]);
+  useReveal([route.page]);
+  useParallax([route.page]);
 
   useEffect(() => {
     if (route.page !== 'home') {
       window.scrollTo(0, 0);
-      const post = route.page === 'post' && posts.find((p) => p.slug === route.slug);
-      document.title = post ? `${post.title} | ${site.shortName}` : `${site.name}, Vijayawada`;
+      document.title = `${site.name}, Vijayawada`;
     } else {
       document.title = `${site.name}, Vijayawada | IVF, IUI & ICSI`;
       if (route.anchor && route.anchor.length > 1) {
@@ -46,7 +43,6 @@ export default function App() {
         Skip to content
       </a>
       <Header overlay={route.page === 'home'} />
-      {route.page === 'post' && <BlogPost slug={route.slug} />}
       {(route.page === 'privacy' || route.page === 'terms') && <Legal page={route.page} />}
       {route.page === 'home' && (
         <main id="main">
@@ -62,7 +58,6 @@ export default function App() {
           <Testimonials />
           <Faq />
           <Appointment />
-          <Blog />
           <Contact />
         </main>
       )}
