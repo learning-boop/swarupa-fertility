@@ -1,20 +1,52 @@
+import { useEffect, useState } from 'react';
 import { ArrowUpRight, Phone, ShieldCheck, Siren } from 'lucide-react';
 import { site, doctor, taglines } from '../config/site';
 import family from '../assets/hero-family.webp';
 import drPhoto from '../assets/dr-chandana.webp';
 
+// Drop a short, silent clip at src/assets/video/hero.mp4 (or .webm) and it plays over the photo once it can.
+const heroVideo = Object.values(import.meta.glob('../assets/video/hero.{mp4,webm}', { eager: true, import: 'default' }))[0];
+
+/** Skip the video for visitors who asked for less motion or less data; they keep the photo. */
+function useVideoAllowed() {
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = navigator.connection?.saveData;
+    setAllowed(Boolean(heroVideo) && !reduced && !saveData);
+  }, []);
+  return allowed;
+}
+
 export default function Hero() {
+  const videoAllowed = useVideoAllowed();
+  const [playing, setPlaying] = useState(false);
   return (
     <section id="top" className="relative isolate flex min-h-[640px] items-end overflow-hidden bg-navy-night pt-32 sm:min-h-[760px] lg:min-h-[100svh]">
-      {/* full-bleed photo with slow zoom, as in the reference */}
+      {/* full-bleed photo with slow zoom; the video fades in over it once it is actually playing */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-y-0 right-0 w-full overflow-hidden lg:w-[62%] lg:[mask-image:linear-gradient(to_right,transparent,black_30%)]">
           <img
             src={family}
             alt="A smiling couple cradling their newborn baby"
             fetchpriority="high"
-            className="kenburns h-full w-full object-cover object-[62%_30%]"
+            className={`kenburns h-full w-full object-cover object-[62%_30%] transition-opacity duration-[1500ms] ${playing ? 'opacity-0' : 'opacity-100'}`}
           />
+          {videoAllowed && (
+            <video
+              src={heroVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+              // iOS only autoplays when muted is set on the element itself, which React's `muted` prop doesn't guarantee.
+              ref={(v) => { if (v) { v.muted = true; v.defaultMuted = true; } }}
+              onPlaying={() => setPlaying(true)}
+              className={`absolute inset-0 h-full w-full object-cover object-[70%_50%] transition-opacity duration-[1500ms] ${playing ? 'opacity-100' : 'opacity-0'}`}
+            />
+          )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-navy-night via-navy-night/80 to-navy-night/10 lg:via-[45%] lg:via-navy-night/90 lg:to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-night/90 via-transparent to-navy-night/50" />
